@@ -1,7 +1,9 @@
 const roteador = require('express').Router()
 const TabelaFornecedor = require('./TabelaFornecedor')
 const Fornecedor = require('./Fornecedor')
-const NaoEncontrado = require('../../erros/NãoEncontrado')
+
+
+
 
 
 roteador.get('/', async (requisicao,resposta) => 
@@ -13,7 +15,7 @@ roteador.get('/', async (requisicao,resposta) =>
     )
 })
 
-roteador.post('/', async(requisicao,resposta) =>{
+roteador.post('/', async(requisicao,resposta,proximo) =>{
     try {
         const dadosRecebidos = requisicao.body;
         const fornecedor = new Fornecedor(dadosRecebidos)
@@ -24,18 +26,13 @@ roteador.post('/', async(requisicao,resposta) =>{
         )
         
     } catch (error) {
-        resposta.status(400)
-        resposta.send(
-            JSON.stringify({
-                mensagem: error.message
-    
-            })
-        )
+        
+        proximo(error)
         
     }
 })
 
-roteador.get('/:idFornecedor',async (requisicao,resposta) =>{
+roteador.get('/:idFornecedor',async (requisicao,resposta,proximo) =>{
    try {
     const id = requisicao.params.idFornecedor
     const fornecedor = new Fornecedor({id:id}) 
@@ -46,13 +43,7 @@ roteador.get('/:idFornecedor',async (requisicao,resposta) =>{
     )
        
    } catch (error) {
-       resposta.status(404)
-       resposta.send(
-           JSON.stringify({
-               mensagem: error.message
-
-           })
-       )
+       proximo(error)
    }
     
 })
@@ -72,7 +63,7 @@ roteador.put('/:idFornecedor',async (requisicao,resposta,proximo) =>{
     }
 })
 
-roteador.delete('/:idFornecedor', async(requisicao,resposta) => {
+roteador.delete('/:idFornecedor', async(requisicao,resposta,proximo) => {
     
    try {
     const id = requisicao.params.idFornecedor
@@ -82,13 +73,7 @@ roteador.delete('/:idFornecedor', async(requisicao,resposta) => {
     resposta.status(204)
     resposta.end()  
    } catch (error) {
-        resposta.status(404)
-        resposta.send(
-            JSON.stringify({
-                mensagem: error.message
-
-        })
-    )
+        proximo(error)
        
    }
 })
